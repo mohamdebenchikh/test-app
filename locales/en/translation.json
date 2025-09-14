@@ -1,0 +1,34 @@
+{
+  "errors": {
+    "routeNotFound": "Route not found",
+    "incorrectEmailOrPassword": "Incorrect email or password",
+    "validationError": "Validation error",
+    "resourceExists": "Resource already exists",
+    "internalServerError": "Internal Server Error"
+  },
+  "validation": {
+    "email": {
+      "base": "Email must be a string",
+      "empty": "Email is not allowed to be empty",
+      "invalid": "Email must be a valid email",
+      "required": "Email is a required field"
+    },
+    "password": {
+      "base": "Password must be a string",
+      "empty": "Password is not allowed to be empty",
+      "required": "Password is a required field"
+    },
+    "name": {
+      "base": "Name must be a string",
+      "empty": "Name is not allowed to be empty",
+      "required": "Name is a required field"
+    },
+    "role": {
+      "base": "Role must be a string",
+      "empty": "Role is not allowed to be empty",
+      "invalid": "Role must be one of [client, provider]",
+      "required": "Role is a required field"
+    }
+  },
+  "welcome": "Welcome"
+}
