@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "cross-env NODE_ENV=test jest --runInBand"
+    "test": "cross-env NODE_ENV=test jest --config jest.config.js --runInBand --coverage"
   },
   "keywords": [],
   "author": "",
@@ -42,6 +42,7 @@
     "jest": "^30.1.3",
     "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.3",
+    "sqlite3": "^5.1.7",
     "supertest": "^7.1.4"
   }
 }
