@@ -9,4 +9,9 @@ module.exports = {
    * @type {object}
    */
   authValidation: require('./auth.validation'),
+  /**
+   * The user validation schemas.
+   * @type {object}
+   */
+  userValidation: require('./user.validation'),
 };

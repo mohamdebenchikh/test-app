@@ -9,4 +9,9 @@ module.exports = {
    * @type {object}
    */
   authController: require('./auth.controller'),
+  /**
+   * The user controller.
+   * @type {object}
+   */
+  userController: require('./user.controller'),
 };

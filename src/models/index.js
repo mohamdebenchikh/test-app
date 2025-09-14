@@ -47,8 +47,12 @@ db.City = require("./City")(sequelize, DataTypes);
 db.Service = require("./Service")(sequelize, DataTypes);
 db.ServiceTranslation = require("./ServiceTranslation")(sequelize, DataTypes);
 db.ProviderService = require("./ProviderService")(sequelize, DataTypes);
+db.Token = require("./Token")(sequelize, DataTypes);
 
 // Associations
+db.Token.belongsTo(db.User, { foreignKey: 'user_id' });
+db.User.hasMany(db.Token, { foreignKey: 'user_id' });
+
 db.User.belongsTo(db.City, { foreignKey: 'city_id' });
 db.City.hasMany(db.User, { foreignKey: 'city_id' });
 

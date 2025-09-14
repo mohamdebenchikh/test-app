@@ -41,6 +41,9 @@ if (process.env.NODE_ENV !== "production") {
   }));
 }
 
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 // API routes
 app.use("/api", routes);
 

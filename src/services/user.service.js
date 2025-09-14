@@ -3,8 +3,10 @@
  * @module services/user
  */
 
+const httpStatus = require('http-status');
 const { User, Service } = require('../models');
-const { hashPassword } = require('../utils/password');
+const { hashPassword, comparePassword } = require('../utils/password');
+const ApiError = require('../utils/ApiError');
 
 /**
  * Creates a new user.
@@ -55,8 +57,50 @@ const addServiceToUser = async (userId, serviceId) => {
  * @property {function} getUserByEmail - Gets a user by their email address.
  * @property {function} addServiceToUser - Adds a service to a user's profile.
  */
+const getUserById = async (id) => {
+    return User.findByPk(id);
+};
+
+const updateUserById = async (userId, updateBody) => {
+    const user = await getUserById(userId);
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    }
+    Object.assign(user, updateBody);
+    await user.save();
+    return user;
+};
+
+const updateUserPassword = async (userId, body) => {
+    const user = await getUserById(userId);
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    if (!(await comparePassword(body.oldPassword, user.password))) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect password');
+    }
+    const hashedPassword = await hashPassword(body.newPassword);
+    await updateUserById(userId, { password: hashedPassword });
+};
+
+const deleteUserById = async (userId) => {
+    const user = await getUserById(userId);
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    await user.destroy();
+    return user;
+};
+
 module.exports = {
   createUser,
   getUserByEmail,
   addServiceToUser,
+  getUserById,
+  updateUserById,
+  updateUserPassword,
+  deleteUserById,
 };

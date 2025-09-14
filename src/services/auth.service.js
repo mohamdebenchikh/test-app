@@ -6,9 +6,10 @@
 const httpStatus = require('http-status');
 const userService = require('./user.service');
 const tokenService = require('./token.service');
+const emailService = require('./email.service');
 const ApiError = require('../utils/ApiError');
 const { comparePassword } = require('../utils/password');
-const { User } = require('../models');
+const { User, Token } = require('../models');
 
 /**
  * Registers a new user.
@@ -38,7 +39,28 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   return user;
 };
 
+const forgotPassword = async (email) => {
+    const resetPasswordToken = await tokenService.generateResetPasswordToken(email);
+    await emailService.sendResetPasswordEmail(email, resetPasswordToken);
+};
+
+const resetPassword = async (resetPasswordToken, newPassword) => {
+    try {
+        const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, 'resetPassword');
+        const user = await userService.getUserById(resetPasswordTokenDoc.user_id);
+        if (!user) {
+            throw new Error();
+        }
+        await userService.updateUserById(user.id, { password: newPassword });
+        await Token.destroy({ where: { user_id: user.id, type: 'resetPassword' } });
+    } catch (error) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+    }
+};
+
 module.exports = {
   register,
   loginUserWithEmailAndPassword,
+  forgotPassword,
+  resetPassword,
 };

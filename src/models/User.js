@@ -109,5 +109,16 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  /**
+   * Check if email is taken
+   * @param {string} email - The user's email
+   * @param {UUID} [excludeUserId] - The id of the user to be excluded
+   * @returns {Promise<boolean>}
+   */
+  User.isEmailTaken = async function (email, excludeUserId) {
+    const user = await this.findOne({ where: { email, id: { [sequelize.Op.ne]: excludeUserId } } });
+    return !!user;
+  };
+
   return User;
 };

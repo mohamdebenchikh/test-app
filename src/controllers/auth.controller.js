@@ -39,7 +39,19 @@ const login = catchAsync(async (req, res) => {
  * @property {function} register - Handles user registration.
  * @property {function} login - Handles user login.
  */
+const forgotPassword = catchAsync(async (req, res) => {
+    await authService.forgotPassword(req.body.email);
+    res.status(httpStatus.NO_CONTENT).send();
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+    await authService.resetPassword(req.query.token, req.body.password);
+    res.status(httpStatus.NO_CONTENT).send();
+});
+
 module.exports = {
   register,
   login,
+  forgotPassword,
+  resetPassword,
 };
