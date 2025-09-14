@@ -1,22 +1,8 @@
-/**
- * @fileoverview Barrel file for exporting all services.
- * @module services
- */
-
 module.exports = {
-  /**
-   * The authentication service.
-   * @type {object}
-   */
   authService: require('./auth.service'),
-  /**
-   * The user service.
-   * @type {object}
-   */
-  userService: require('./user.service'),
-  /**
-   * The token service.
-   * @type {object}
-   */
+  cityService: require('./city.service'),
+  emailService: require('./email.service'),
+  serviceService: require('./service.service'),
   tokenService: require('./token.service'),
+  userService: require('./user.service'),
 };
