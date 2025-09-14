@@ -1,4 +1,35 @@
+/**
+ * @fileoverview Defines the User model for Sequelize.
+ * @module models/User
+ */
+
+/**
+ * Defines the User model.
+ * @param {object} sequelize - The Sequelize instance.
+ * @param {object} DataTypes - The Sequelize data types.
+ * @returns {object} The User model.
+ */
 module.exports = (sequelize, DataTypes) => {
+  /**
+   * @class User
+   * @classdesc The User model.
+   * @property {string} id - The UUID of the user.
+   * @property {string} name - The name of the user.
+   * @property {string} email - The email of the user.
+   * @property {string} password - The hashed password of the user.
+   * @property {string} avatar - The URL of the user's avatar.
+   * @property {string} bio - The biography of the user.
+   * @property {string} phone_number - The phone number of the user.
+   * @property {string} role - The role of the user ('client' or 'provider').
+   * @property {string} gender - The gender of the user ('male', 'female', 'other').
+   * @property {Date} birthdate - The birthdate of the user.
+   * @property {boolean} verify - Whether the user's email is verified.
+   * @property {Date} last_seen - The last time the user was active.
+   * @property {object} available_days - The days the user is available (for providers).
+   * @property {string} language - The preferred language of the user.
+   * @property {boolean} active_status - Whether the user's account is active.
+   * @property {string} city_id - The ID of the city the user resides in.
+   */
   const User = sequelize.define(
     "User",
     {

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview The main entry point of the application.
+ * @module index
+ */
+
 require("dotenv").config();
 const express = require("express");
 const helmet = require("helmet");
@@ -9,9 +14,14 @@ const routes = require("./src/routes/index");
 const errorHandler = require("./src/middlewares/errorHandler");
 const ApiError = require("./src/utils/ApiError");
 const logger = require("./src/utils/logger");
+const i18next = require('./src/config/i18n');
+const i18nextMiddleware = require('i18next-http-middleware');
 
 
 const app = express();
+
+// i18n middleware
+app.use(i18nextMiddleware.handle(i18next));
 
 // Middleware
 app.use(helmet({
@@ -31,14 +41,15 @@ if (process.env.NODE_ENV !== "production") {
   }));
 }
 
+// API routes
 app.use("/api", routes);
 
-// Not found
+// Handle 404 Not Found errors
 app.use((req, res, next) => {
-  next(new ApiError(404, "Route not found"));
+  next(new ApiError(404, "errors.routeNotFound"));
 });
 
-// Error handler
+// Global error handler
 app.use(errorHandler);
 
 // Start server only if not in test mode
@@ -49,4 +60,9 @@ if (process.env.NODE_ENV !== "test") {
   });
 }
 
+/**
+ * The Express application instance.
+ * @exports index
+ * @type {object}
+ */
 module.exports = app; // ✅ Export app for testing

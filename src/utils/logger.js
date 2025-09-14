@@ -1,6 +1,16 @@
+/**
+ * @fileoverview Configures and exports a Winston logger instance.
+ * @module utils/logger
+ */
+
 const { createLogger, format, transports } = require("winston");
 const path = require("path");
 
+/**
+ * The Winston logger instance.
+ * @exports utils/logger
+ * @type {object}
+ */
 const logger = createLogger({
     level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'warn' : 'info'),
 

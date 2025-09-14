@@ -1,10 +1,16 @@
+/**
+ * @fileoverview Services for user management.
+ * @module services/user
+ */
+
 const { User, Service } = require('../models');
 const { hashPassword } = require('../utils/password');
 
 /**
- * Create a user
- * @param {Object} userBody
- * @returns {Promise<User>}
+ * Creates a new user.
+ * @function createUser
+ * @param {object} userBody - The user's data.
+ * @returns {Promise<User>} The created user.
  */
 const createUser = async (userBody) => {
   const { service_ids, ...restOfBody } = userBody;
@@ -20,18 +26,20 @@ const createUser = async (userBody) => {
 };
 
 /**
- * Get user by email
- * @param {string} email
- * @returns {Promise<User>}
+ * Gets a user by their email address.
+ * @function getUserByEmail
+ * @param {string} email - The user's email.
+ * @returns {Promise<User|null>} The user, or null if not found.
  */
 const getUserByEmail = async (email) => {
   return User.findOne({ where: { email } });
 };
 
 /**
- * Add a service to a user
- * @param {string} userId
- * @param {string} serviceId
+ * Adds a service to a user's profile.
+ * @function addServiceToUser
+ * @param {string} userId - The ID of the user.
+ * @param {string} serviceId - The ID of the service to add.
  * @returns {Promise<void>}
  */
 const addServiceToUser = async (userId, serviceId) => {
@@ -40,6 +48,13 @@ const addServiceToUser = async (userId, serviceId) => {
     await user.addService(service);
 };
 
+/**
+ * @exports services/user
+ * @type {object}
+ * @property {function} createUser - Creates a new user.
+ * @property {function} getUserByEmail - Gets a user by their email address.
+ * @property {function} addServiceToUser - Adds a service to a user's profile.
+ */
 module.exports = {
   createUser,
   getUserByEmail,
