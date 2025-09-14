@@ -5,9 +5,11 @@
 
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
-const config = require('../config/auth');
+const config = require('../config/config');
 const { tokenTypes } = require('../config/tokens');
-const { User } = require('../models');
+const { User, Token } = require('../models');
+const ApiError = require('../utils/ApiError');
+const httpStatus = require('http-status');
 
 /**
  * Generates a JWT token.
@@ -47,7 +49,41 @@ const generateAuthTokens = async (user) => {
   };
 };
 
+const saveToken = async (token, userId, expires, type, blacklisted = false) => {
+    const tokenDoc = await Token.create({
+        token,
+        user_id: userId,
+        expires: expires.toDate(),
+        type,
+        blacklisted,
+    });
+    return tokenDoc;
+};
+
+const verifyToken = async (token, type) => {
+    const payload = jwt.verify(token, config.jwt.secret);
+    const tokenDoc = await Token.findOne({ where: { token, type, user_id: payload.sub, blacklisted: false } });
+    if (!tokenDoc) {
+        throw new Error('Token not found');
+    }
+    return tokenDoc;
+};
+
+const generateResetPasswordToken = async (email) => {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+    }
+    const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
+    const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
+    await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
+    return resetPasswordToken;
+};
+
 module.exports = {
   generateToken,
   generateAuthTokens,
+  saveToken,
+  verifyToken,
+  generateResetPasswordToken,
 };
