@@ -1,6 +1,6 @@
 const express = require('express');
-const { authenticate, authorize } = require('../../middlewares/auth');
-const { userController } = require('../../controllers');
+const { authenticate, authorize } = require('../middlewares/auth');
+const { userController } = require('../controllers');
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router
   .patch(authenticate, userController.updateUser)
   .delete(authenticate, userController.deleteUser);
 
-router.route('/profile/change-password').post(authenticate, userController.updateUserPassword);
+router.route('/profile/change-password').post(authenticate, userController.changePassword);
 
 router.route('/profile/services').post(authenticate, authorize(['provider']), userController.updateProviderServices);
 

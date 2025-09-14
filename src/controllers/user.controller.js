@@ -7,7 +7,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
 
-const updateProfile = catchAsync(async (req, res) => {
+const updateUser = catchAsync(async (req, res) => {
   const user = await userService.updateUserById(req.user.id, req.body);
   res.send(user);
 });
@@ -22,21 +22,27 @@ const changePassword = catchAsync(async (req, res) => {
     res.status(httpStatus.NO_CONTENT).send();
 });
 
-const deleteAccount = catchAsync(async (req, res) => {
+const deleteUser = catchAsync(async (req, res) => {
     await userService.deleteUserById(req.user.id);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
-const getProfile = catchAsync(async (req, res) => {
+const getUser = catchAsync(async (req, res) => {
     const user = await userService.getUserById(req.user.id);
     res.send(user);
 });
 
+const updateProviderServices = catchAsync(async (req, res) => {
+  const user = await userService.updateProviderServices(req.user.id, req.body.serviceIds);
+  res.send(user);
+});
+
 
 module.exports = {
-    updateProfile,
+    updateUser,
     uploadAvatar,
     changePassword,
-    deleteAccount,
-    getProfile,
+    deleteUser,
+    getUser,
+    updateProviderServices
 };
