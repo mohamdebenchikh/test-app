@@ -4,6 +4,7 @@
  */
 
 const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 
 /**
  * Generates a new JWT.
@@ -12,7 +13,7 @@ const jwt = require('jsonwebtoken');
  * @returns {string} The generated JWT.
  */
 const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, {
+  return jwt.sign(payload, config.jwt.secret, {
     expiresIn: '24h',
     issuer: 'your-app-name',
     audience: 'your-app-users'
@@ -28,7 +29,7 @@ const generateToken = (payload) => {
  */
 const verifyToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, config.jwt.secret);
   } catch (error) {
     throw new Error('Invalid or expired token');
   }
@@ -41,7 +42,7 @@ const verifyToken = (token) => {
  * @returns {string} The generated refresh token.
  */
 const refreshToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, {
+  return jwt.sign(payload, config.jwt.secret, {
     expiresIn: '7d' // Longer expiry for refresh tokens
   });
 };

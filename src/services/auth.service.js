@@ -3,7 +3,7 @@
  * @module services/auth
  */
 
-const httpStatus = require('http-status');
+const httpStatus = require('http-status').default;
 const userService = require('./user.service');
 const tokenService = require('./token.service');
 const emailService = require('./email.service');

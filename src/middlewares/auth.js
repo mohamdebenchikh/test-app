@@ -62,25 +62,53 @@ const optionalAuth = (req, res, next) => {
 
 /**
  * @function authorize
- * @description This is a placeholder for a role-based authorization middleware. It is not yet implemented.
- * @param {string[]} requiredRoles - An array of roles that are allowed to access the route.
+ * @description Role-based authorization middleware.
+ * @param {string|string[]} requiredRoles - A role or array of roles that are allowed to access the route.
  * @returns {function} - The middleware function.
  */
 const authorize = (requiredRoles) => (req, res, next) => {
-    // This is a placeholder. The actual implementation should check the user's role.
-    // For now, it does nothing and just calls next().
+    if (!req.user) {
+        return next(new ApiError(401, 'Authentication required'));
+    }
+
+    const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+    
+    // Check if user has required role
+    if (roles.includes('admin')) {
+        // Only allow actual admin role for admin endpoints
+        if (req.user.role !== 'admin') {
+            return next(new ApiError(403, 'Insufficient permissions'));
+        }
+    } else if (!roles.includes(req.user.role)) {
+        return next(new ApiError(403, 'Insufficient permissions'));
+    }
+
     next();
+};
+
+/**
+ * Combined authentication and authorization middleware
+ * @param {string|string[]} requiredRoles - Required roles for access
+ * @returns {function[]} Array of middleware functions
+ */
+const auth = (requiredRoles = null) => {
+    if (requiredRoles) {
+        return [authenticate, authorize(requiredRoles)];
+    }
+    return authenticate;
 };
 
 /**
  * @exports middlewares/auth
  * @type {object}
  * @property {function} authenticate - Middleware to authenticate a user with a JWT.
- * @property {function} authorize - Placeholder for a role-based authorization middleware.
+ * @property {function} authorize - Role-based authorization middleware.
  * @property {function} optionalAuth - Middleware for optional authentication.
+ * @property {function} auth - Combined authentication and authorization middleware.
  */
 module.exports = {
     authenticate,
     authorize,
-    optionalAuth
+    optionalAuth,
+    auth
 }

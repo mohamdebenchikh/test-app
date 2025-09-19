@@ -19,6 +19,7 @@ class ApiError extends Error {
     super(message);
     this.statusCode = statusCode;
     this.code = code; // e.g., 'USER_NOT_FOUND', 'INVALID_CREDENTIALS'
+    this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
     Error.captureStackTrace(this, this.constructor);
   }
 

@@ -24,7 +24,11 @@ function errorHandler(err, req, res, next) {
   if (isCelebrateError(err)) {
     const details = [];
     for (const [segment, joiError] of err.details.entries()) {
-      details.push(t(joiError.message));
+      try {
+        details.push(t(joiError.message));
+      } catch (e) {
+        details.push(joiError.message);
+      }
     }
     return res.status(400).json({
       success: false,
@@ -35,7 +39,13 @@ function errorHandler(err, req, res, next) {
 
   // Sequelize validation errors
   if (err.name === 'SequelizeValidationError') {
-    const errors = err.errors.map(e => t(e.message));
+    const errors = err.errors.map(e => {
+      try {
+        return t(e.message);
+      } catch (ex) {
+        return e.message;
+      }
+    });
     return res.status(400).json({
       success: false,
       message: t("errors.validationError"),
@@ -48,30 +58,57 @@ function errorHandler(err, req, res, next) {
   if (err.name === 'SequelizeUniqueConstraintError') {
     return res.status(409).json({
       success: false,
-      message: t("errors.resourceExists") // I need to add this key to my translation files
+      message: t("errors.resourceExists")
     });
   }
 
   // Known ApiError
   if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({
+    // Try to translate the message, but fall back to the original message if translation fails
+    let message = err.message;
+    try {
+      message = t(err.message);
+    } catch (e) {
+      // If translation fails, use the original message
+    }
+    
+    // Ensure we have a valid status code
+    const statusCode = err.statusCode || 500;
+    
+    return res.status(statusCode).json({
       success: false,
-      message: t(err.message),
+      message,
     });
   }
 
   if (process.env.NODE_ENV === 'development') {
+    // Try to translate the message, but fall back to the original message if translation fails
+    let message = "errors.internalServerError";
+    try {
+      message = t("errors.internalServerError");
+    } catch (e) {
+      // If translation fails, use a default message
+      message = "Internal Server Error";
+    }
     return res.status(500).json({
       success: false,
-      message: t("errors.internalServerError"), // I need to add this key
+      message,
       stack: err.stack // Only in dev
     });
   }
 
   // Unexpected errors
+  // Try to translate the message, but fall back to the original message if translation fails
+  let message = "errors.internalServerError";
+  try {
+    message = t("errors.internalServerError");
+  } catch (e) {
+    // If translation fails, use a default message
+    message = "Internal Server Error";
+  }
   res.status(500).json({
     success: false,
-    message: t("errors.internalServerError"),
+    message,
   });
 }
 

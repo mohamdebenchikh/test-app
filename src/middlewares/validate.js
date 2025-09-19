@@ -3,7 +3,7 @@
  * @module middlewares/validate
  */
 
-const { celebrate } = require("celebrate");
+const { celebrate, Joi } = require("celebrate");
 
 /**
  * Creates a validation middleware using the provided Joi schema.
@@ -13,6 +13,7 @@ const { celebrate } = require("celebrate");
  * @returns {function} - The validation middleware.
  */
 function validate(schema,options = {}) {
+  // Use the Joi instance from celebrate to avoid version conflicts
   return celebrate(schema, {
     abortEarly: false, // return all errors, not just the first
     stripUnknown: true, // remove extra fields not in schema
