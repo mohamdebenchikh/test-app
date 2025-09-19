@@ -5,6 +5,7 @@
 
 const express = require('express');
 const authRouter = require('./auth.route');
+const adminRouter = require('./admin.route');
 const userRouter = require('./user.route');
 const cityRoute = require('./city.route');
 const serviceRoute = require('./service.route');
@@ -34,6 +35,10 @@ const defaultRoutes = [
   {
     path: '/auth',
     route: authRouter,
+  },
+  {
+    path: '/admin',
+    route: adminRouter,
   },
   {
     path: '/users',

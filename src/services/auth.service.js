@@ -5,6 +5,7 @@
 
 const httpStatus = require('http-status').default;
 const userService = require('./user.service');
+const adminService = require('./admin.service');
 const tokenService = require('./token.service');
 const emailService = require('./email.service');
 const ApiError = require('../utils/ApiError');
@@ -58,9 +59,18 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     }
 };
 
+const loginAdminWithEmailAndPassword = async (email, password) => {
+  const admin = await adminService.getAdminByEmail(email);
+  if (!admin || !(await comparePassword(password, admin.password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'errors.incorrectEmailOrPassword');
+  }
+  return admin;
+};
+
 module.exports = {
   register,
   loginUserWithEmailAndPassword,
   forgotPassword,
   resetPassword,
+  loginAdminWithEmailAndPassword,
 };

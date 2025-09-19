@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const moment = require('moment');
 const config = require('../config/config');
 const { tokenTypes } = require('../config/tokens');
-const { User, Token } = require('../models');
+const { User, Admin, Token } = require('../models');
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
 
@@ -80,10 +80,23 @@ const generateResetPasswordToken = async (email) => {
     return resetPasswordToken;
 };
 
+const generateAdminAuthTokens = async (admin) => {
+  const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
+  const accessToken = generateToken(admin.id, accessTokenExpires, tokenTypes.ACCESS);
+
+  return {
+    access: {
+      token: accessToken,
+      expires: accessTokenExpires.toDate(),
+    },
+  };
+};
+
 module.exports = {
   generateToken,
   generateAuthTokens,
   saveToken,
   verifyToken,
   generateResetPasswordToken,
+  generateAdminAuthTokens,
 };
