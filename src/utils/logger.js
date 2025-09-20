@@ -1,53 +1,68 @@
-/**
- * @fileoverview Configures and exports a Winston logger instance.
- * @module utils/logger
- */
+const { createLogger, format, transports } = require('winston');
+require('winston-daily-rotate-file');
+const fs = require('fs');
+const config = require('../config/logger');
 
-const { createLogger, format, transports } = require("winston");
-const path = require("path");
+const { logDir, datePattern, zippedArchive, maxSize, maxFiles } = config;
 
-/**
- * The Winston logger instance.
- * @exports utils/logger
- * @type {object}
- */
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+
 const logger = createLogger({
-    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'warn' : 'info'),
-
-    format: format.combine(
-        format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        format.errors({ stack: true }),
-        format.splat(),
-        format.json()
-    ),
-    transports: [
-        // Console output
-        new transports.Console({
-            format: format.combine(
-                format.colorize(),
-                format.printf(
-                    ({ level, message, timestamp, stack }) =>
-                        `${timestamp} ${level}: ${stack || message}`
-                )
-            ),
-        }),
-
-        // Save errors in file
-        new transports.File({
-            filename: path.join(__dirname, "../../logs/error.log"),
-            level: "error",
-        }),
-
-        // Save all logs in file
-        new transports.File({
-            filename: path.join(__dirname, "../../logs/combined.log"),
-        }),
-    ],
+  level: config.level,
+  format: format.combine(
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.errors({ stack: true }),
+    format.splat(),
+    format.json()
+  ),
+  transports: [
+    new transports.Console({
+      format: format.combine(
+        format.colorize(),
+        format.printf(({ level, message, timestamp, stack }) => `${timestamp} ${level}: ${stack || message}`)
+      ),
+    }),
+    new transports.DailyRotateFile({
+      level: 'error',
+      filename: `${logDir}/error-%DATE%.log`,
+      datePattern,
+      zippedArchive,
+      maxSize,
+      maxFiles,
+    }),
+    new transports.DailyRotateFile({
+      filename: `${logDir}/combined-%DATE%.log`,
+      datePattern,
+      zippedArchive,
+      maxSize,
+      maxFiles,
+    }),
+  ],
+  exceptionHandlers: [
+    new transports.DailyRotateFile({
+      filename: `${logDir}/exceptions-%DATE%.log`,
+      datePattern,
+      zippedArchive,
+      maxSize,
+      maxFiles,
+    }),
+  ],
+  rejectionHandlers: [
+    new transports.DailyRotateFile({
+      filename: `${logDir}/rejections-%DATE%.log`,
+      datePattern,
+      zippedArchive,
+      maxSize,
+      maxFiles,
+    }),
+  ],
+  exitOnError: false,
 });
 
-// In production, log only warnings and errors to console
-if (process.env.NODE_ENV === "production") {
-    logger.remove(logger.transports.Console);
+if (process.env.NODE_ENV === 'production') {
+  logger.remove(logger.transports.find(t => t.name === 'console'));
 }
 
 module.exports = logger;

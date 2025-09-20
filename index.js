@@ -8,12 +8,12 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 const compression = require("compression");
-const morgan = require("morgan");
 const {sequelize} = require("./src/models");
 const routes = require("./src/routes/index");
 const errorHandler = require("./src/middlewares/errorHandler");
 const ApiError = require("./src/utils/ApiError");
 const logger = require("./src/utils/logger");
+const morganMiddleware = require("./src/middlewares/morgan");
 const i18next = require('./src/config/i18n');
 const i18nextMiddleware = require('i18next-http-middleware');
 const http = require('http');
@@ -51,13 +51,7 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-if (process.env.NODE_ENV !== "production") {
-  app.use(morgan("dev"));
-} else {
-  app.use(morgan("tiny", {
-    stream: { write: (message) => logger.http(message.trim()) }
-  }));
-}
+app.use(morganMiddleware);
 
 // Serve uploaded files
 app.use('/uploads', express.static('uploads'));
